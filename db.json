@@ -1,0 +1,19 @@
+{
+    "users": [
+      {
+        "id": "5c29",
+        "name": "ali",
+        "phone": "010-9182673",
+        "email": "ali@gmail.com"
+      },
+      {
+        "id": "e9f3",
+        "name": "ZhenEn",
+        "phone": "0101234567",
+        "email": "zen@gmail.com"
+      }
+    ],
+    "assignments": [],
+    "grades": [],
+    "meetings": []
+  }
