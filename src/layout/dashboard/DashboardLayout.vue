@@ -38,7 +38,6 @@
       </mobile-menu>
     </side-bar>
     <div class="main-panel">
-      <top-navbar></top-navbar>
 
       <dashboard-content @click.native="toggleSidebar"> </dashboard-content>
 
@@ -49,10 +48,8 @@
 <script>
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
-import TopNavbar from "./TopNavbar.vue";
 export default {
   components: {
-    TopNavbar,
     DashboardContent,
     MobileMenu,
   },
