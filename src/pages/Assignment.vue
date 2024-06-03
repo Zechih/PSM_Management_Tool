@@ -7,13 +7,13 @@
     </div>
 
     <form v-if="showForm" @submit.prevent="saveToAssignmentList" class="form">
-      <input v-model="newAssignment.Aname" placeholder="Name" class="input" :class="{ 'is-invalid': !validName }"/><br>
+      <input v-model="newAssignment.name" placeholder="Name" class="input" :class="{ 'is-invalid': !validName }"/><br>
       <div class="input-group">
-        <input type="datetime-local" v-model="newAssignment.AsetTime" placeholder="Set Date" class="input" :class="{ 'is-invalid': !validSetTime }"/>
+        <input type="datetime-local" v-model="newAssignment.set_time" placeholder="Set Date" class="input" :class="{ 'is-invalid': !validSetTime }"/>
         <button type="button" @click="setCurrentTime" class="button small-button">Set Current Time</button>
       </div>
-      <input type="datetime-local" v-model="newAssignment.AdueDate" placeholder="Due Date" class="input" :class="{ 'is-invalid': !validDueDate }"/><br>
-      <input v-model="newAssignment.Adescription" placeholder="Description" class="input" :class="{ 'is-invalid': !validDescription }"/><br>
+      <input type="datetime-local" v-model="newAssignment.due_date" placeholder="Due Date" class="input" :class="{ 'is-invalid': !validDueDate }"/><br>
+      <input v-model="newAssignment.description" placeholder="Description" class="input" :class="{ 'is-invalid': !validDescription }"/><br>
       <div class="calculated-time">
         Remaining Time: {{ calculatedRemainingTime }}
       </div>
@@ -22,17 +22,17 @@
     </form>
 
     <div class="assignment-list">
-      <div v-for="assignment in Assignment" :key="assignment.Aname" class="assignment-item">
+      <div v-for="assignment in Assignment" :key="assignment.id" class="assignment-item">
         <div class="assignment-details">
-          <h3>{{ assignment.Aname }}</h3>
-          <p><strong>Set Date:</strong>{{ formatDateTime(assignment.AsetTime) }}</p>
-          <p><strong>Due Date:</strong>{{ formatDateTime(assignment.AdueDate) }}</p>
-          <p><strong>Description:</strong> {{ assignment.Adescription }}</p>
-          <p><strong>Remaining Time:</strong> {{ calculateRemainingTime(assignment.AsetTime, assignment.AdueDate) }}</p>
+          <h3>{{ assignment.name }}</h3>
+          <p><strong>Set Date:</strong> {{ formatDateTime(assignment.set_time) }}</p>
+          <p><strong>Due Date:</strong> {{ formatDateTime(assignment.due_date) }}</p>
+          <p><strong>Description:</strong> {{ assignment.description }}</p>
+          <p><strong>Remaining Time:</strong> {{ calculateRemainingTime(assignment.set_time, assignment.due_date) }}</p>
         </div>
         <div class="assignment-actions">
           <button @click="editAssignment(assignment)" class="button small-button">Edit</button>
-          <button @click="deleteAssignment(assignment)" class="button small-button delete-button">Delete</button>
+          <button @click="deleteAssignment(assignment.id)" class="button small-button delete-button">Delete</button>
         </div>
       </div>
     </div>
@@ -45,11 +45,11 @@ export default {
     return {
       Assignment: [],
       newAssignment: {
-        Aname: '',
-        AsetTime: '',
-        AdueDate: '',
-        Adescription: '',
-        AremainingTime: ''
+        name: '',
+        set_time: '',
+        due_date: '',
+        description: '',
+        remaining_time: ''
       },
       showForm: false,
       editMode: false,
@@ -58,47 +58,65 @@ export default {
   },
   computed: {
     calculatedRemainingTime() {
-      return this.calculateRemainingTime(this.newAssignment.AsetTime, this.newAssignment.AdueDate);
-    },
-    validName() {
-      return this.newAssignment.Aname.trim() !== '';
-    },
-    validSetTime() {
-      return this.newAssignment.AsetTime !== '';
-    },
-    validDueDate() {
-      return this.newAssignment.AdueDate !== '';
-    },
-    validDescription() {
-      return this.newAssignment.Adescription.trim() !== '';
-    },
-    formIsValid() {
-      return this.validName && this.validSetTime && this.validDueDate && this.validDescription;
-    }
+    return this.calculateRemainingTime(this.newAssignment.set_time, this.newAssignment.due_date);
+  },
+  validName() {
+    return this.newAssignment.name && this.newAssignment.name.trim() !== '';
+  },
+  validSetTime() {
+    return this.newAssignment.set_time !== '';
+  },
+  validDueDate() {
+    return this.newAssignment.due_date !== '';
+  },
+  validDescription() {
+    return this.newAssignment.description && this.newAssignment.description.trim() !== '';
+  },
+  formIsValid() {
+    return this.validName && this.validSetTime && this.validDueDate && this.validDescription;
+  }
   },
   methods: {
     fetchAll() {
-      fetch('http://localhost:3000/assignments')
+    fetch('http://localhost/PSM%20Management%20Tool/index.php')
         .then(response => response.json())
         .then(data => {
-          this.Assignment = data;
+            console.log("Fetched data:", data);
+            this.Assignment = data;
+            console.log("Component data:", this.Assignment); // Log component data after assignment
         })
         .catch(error => {
-          console.error('Error fetching assignments:', error);
+            console.error('Error fetching assignments:', error);
         });
-    },
+},
     startNewAssignment() {
       this.showForm = true;
       this.editMode = false;
-      this.newAssignment = { Aname: '', AsetTime: '', AdueDate: '', Adescription: '', AremainingTime: '' };
     },
     saveToAssignmentList() {
-      this.newAssignment.AremainingTime = this.calculatedRemainingTime;
+      this.newAssignment.remaining_time = this.calculatedRemainingTime;
       
       if (this.editMode) {
-        this.Assignment[this.editIndex] = this.newAssignment;
+        fetch('http://localhost/PSM%20Management%20Tool/index.php', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(this.newAssignment)
+        })
+          .then(response => response.json())
+          .then(data => {
+            this.$set(this.Assignment, this.editIndex, data);
+            this.showForm = false;
+            this.newAssignment = { name: '', set_time: '', due_date: '', description: '', remaining_time: '' };
+            this.editMode = false;
+            this.editIndex = -1;
+          })
+          .catch(error => {
+            console.error('Error updating assignment:', error);
+          });
       } else {
-        fetch('http://localhost:3000/assignments', {
+        fetch('http://localhost/PSM%20Management%20Tool/index.php', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -108,32 +126,31 @@ export default {
           .then(response => response.json())
           .then(data => {
             this.Assignment.push(data);
+            this.showForm = false;
+            this.newAssignment = { name: '', set_time: '', due_date: '', description: '', remaining_time: '' };
           })
           .catch(error => {
             console.error('Error saving assignment:', error);
           });
       }
-      this.showForm = false;
-      this.newAssignment = { Aname: '', AsetTime: '', AdueDate: '', Adescription: '', AremainingTime: '' };
     },
     editAssignment(assignment) {
       this.editMode = true;
       this.showForm = true;
       this.newAssignment = { ...assignment };
-      this.editIndex = this.Assignment.indexOf(assignment);
+      this.editIndex = this.Assignment.findIndex(a => a.id === assignment.id);
     },
-    deleteAssignment(assignment) {
+    deleteAssignment(id) {
       const isConfirmed = confirm('Are you sure you want to delete this assignment?');
       
       if (isConfirmed) {
-        const index = this.Assignment.indexOf(assignment);
-        if (index > -1) {
-          this.Assignment.splice(index, 1);
-        }
-        fetch(`http://localhost:3000/assignments/${assignment.id}`, {
+        fetch(`http://localhost/PSM%20Management%20Tool/index.php?id=${id}`, {
           method: 'DELETE'
         })
           .then(response => response.json())
+          .then(() => {
+            this.Assignment = this.Assignment.filter(assignment => assignment.id !== id);
+          })
           .catch(error => {
             console.error('Error deleting assignment:', error);
           });
@@ -141,23 +158,23 @@ export default {
     },
     cancelForm() {
       this.showForm = false;
-      this.newAssignment = { Aname: '', AsetTime: '', AdueDate: '', Adescription: '', AremainingTime: '' };
+      this.newAssignment = { name: '', set_time: '', due_date: '', description: '', remaining_time: '' };
     },
     setCurrentTime() {
-  const now = new Date();
-
-  // Adjust to Malaysia Time (UTC+8)
-  now.setUTCHours(now.getUTCHours() + 8);
-
-  const year = now.getUTCFullYear();
-  const month = String(now.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-  const day = String(now.getUTCDate()).padStart(2, '0');
-  const hours = String(now.getUTCHours()).padStart(2, '0');
-  const minutes = String(now.getUTCMinutes()).padStart(2, '0');
-
-  const currentDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-  this.newAssignment.AsetTime = currentDateTime;
-},
+      const now = new Date();
+  
+      // Adjust to Malaysia Time (UTC+8)
+      now.setUTCHours(now.getUTCHours() + 8);
+  
+      const year = now.getUTCFullYear();
+      const month = String(now.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+      const day = String(now.getUTCDate()).padStart(2, '0');
+      const hours = String(now.getUTCHours()).padStart(2, '0');
+      const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+  
+      const currentDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+      this.newAssignment.set_time = currentDateTime;
+    },
     calculateRemainingTime(setTime, dueTime) {
       const setTimeDate = new Date(setTime);
       const dueTimeDate = new Date(dueTime);
@@ -172,9 +189,13 @@ export default {
       
       return `${hours} hours ${minutes} minutes`;
     },
-    formatDateTime(dateTimeString) { // To Replace "T" with a space
-      return dateTimeString.replace('T', ' ');
-    }
+    formatDateTime(dateTimeString) {
+  if (dateTimeString) {
+    return dateTimeString.replace('T', ' ');
+  } else {
+    return '';
+  }
+}
   },
   mounted() {
     this.fetchAll();
@@ -207,6 +228,10 @@ export default {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.input[type="file"] {
+  padding: 5px;
 }
 
 .button:hover {

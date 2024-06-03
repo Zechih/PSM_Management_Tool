@@ -3,7 +3,6 @@ import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
 import NotFound from "@/pages/NotFoundPage.vue";
 
 // Admin pages
-import Dashboard from "@/pages/Dashboard.vue";
 import UserProfile from "@/pages/UserProfile.vue";
 import Assignment from "@/pages/Assignment.vue";
 import Grade from "@/pages/Grade.vue";
@@ -13,16 +12,11 @@ const routes = [
   {
     path: "/",
     component: DashboardLayout,
-    redirect: "/dashboard",
+    redirect: "/profile",
     children: [
       {
-        path: "dashboard",
-        name: "dashboard",
-        component: Dashboard,
-      },
-      {
-        path: "stats",
-        name: "stats",
+        path: "profile",
+        name: "profile",
         component: UserProfile,
       },
 
