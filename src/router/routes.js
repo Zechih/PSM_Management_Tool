@@ -12,6 +12,7 @@ import Meeting from "@/pages/Meeting.vue";
 import WelcomePage from "@/pages/Auth/Welcome.vue";
 import LoginPage from "@/pages/Auth/Login.vue";
 import RegisterPage from "@/pages/Auth/Register.vue";
+import Dashboard from "@/pages/Dashboard.vue"
 
 const routes = [
   {
@@ -32,8 +33,13 @@ const routes = [
   {
     path: "/", //dont touch
     component: DashboardLayout,
-    redirect: "/profile",
+    redirect: "/dashboard",
     children: [
+      {
+        path: "dashboard",
+        name: "dashboard",
+        component: Dashboard,
+      },
       {
         path: "profile",
         name: "profile",
