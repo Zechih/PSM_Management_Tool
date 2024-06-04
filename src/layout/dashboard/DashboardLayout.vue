@@ -3,13 +3,12 @@
     <side-bar>
       <template slot="links">
         <sidebar-link to="/dashboard" name="Dashboard" icon="ti-panel" />
-        <sidebar-link to="/stats" name="User Profile" icon="ti-user" />
-        <sidebar-link to="/assignment" name="Assignment" icon="ti-view-list-alt"
-        />
+        <sidebar-link to="/assignment" name="Assignment" icon="ti-view-list-alt"/>
         <sidebar-link to="/grade" name="Grade" icon="ti-text" />
         <sidebar-link to="/meeting" name="Meeting" icon="ti-pencil-alt2" />
+        <sidebar-link to="/stats" name="User Profile" icon="ti-user" />
       </template>
-      <mobile-menu>
+      <!-- <mobile-menu>
         <li class="nav-item">
           <a class="nav-link">
             <i class="ti-panel"></i>
@@ -35,7 +34,7 @@
           </a>
         </li>
         <li class="divider"></li>
-      </mobile-menu>
+      </mobile-menu> -->
     </side-bar>
     <div class="main-panel">
 

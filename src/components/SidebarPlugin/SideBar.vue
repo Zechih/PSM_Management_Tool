@@ -43,19 +43,19 @@ export default {
   props: {
     title: {
       type: String,
-      default: "Paper Dashboard",
+      default: "PSM Management",
     },
     backgroundColor: {
       type: String,
       default: "black",
       validator: (value) => {
-        let acceptedValues = ["white", "black", "darkblue"];
+        let acceptedValues = ["white", "black", "darkblue",];
         return acceptedValues.indexOf(value) !== -1;
       },
     },
     activeColor: {
       type: String,
-      default: "success",
+      default: "info",
       validator: (value) => {
         let acceptedValues = [
           "primary",

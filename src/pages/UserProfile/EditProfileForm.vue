@@ -115,6 +115,13 @@
             Update Profile
           </p-button>
         </div>
+        <br />
+        <div class="text-center">
+          <p-button type="info" round @click.native.prevent="logout">
+            Logout
+          </p-button>
+        </div>
+
         <div class="clearfix"></div>
       </form>
     </div>
@@ -140,6 +147,13 @@ export default {
   methods: {
     updateProfile() {
       alert("Your data: " + JSON.stringify(this.user));
+    },
+  },
+  methods: {
+    logout() {
+      // Perform any necessary logout actions here, such as clearing tokens or user data
+      // Then navigate to the welcome page
+      this.$router.push({ name: "welcome" });
     },
   },
 };

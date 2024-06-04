@@ -9,9 +9,29 @@ import Assignment from "@/pages/Assignment.vue";
 import Grade from "@/pages/Grade.vue";
 import Meeting from "@/pages/Meeting.vue";
 
+//auth pages
+import WelcomePage from "@/pages/Auth/Welcome.vue";
+import LoginPage from "@/pages/Auth/Login.vue";
+import RegisterPage from "@/pages/Auth/Register.vue";
+
 const routes = [
   {
     path: "/",
+    name: "welcome",
+    component: WelcomePage
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: LoginPage
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: RegisterPage
+  },
+  {
+    path: "/", //dont touch
     component: DashboardLayout,
     redirect: "/dashboard",
     children: [
