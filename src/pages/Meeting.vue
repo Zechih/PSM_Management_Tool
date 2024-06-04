@@ -16,10 +16,22 @@
       <button type="button" @click="cancelForm" class="button cancel-button">Cancel</button>
     </form>
 
+    <div class="meeting-list">
+        <div class="meeting-details">
+          <h3> Proposal Discussion </h3>
+          <p><strong>Date and Time:</strong> 5/6/2024 11.00am </p>
+          <p><strong>Duration:</strong> 1 hour </p>
+          <p><strong>Location:</strong> Webex </p>
+          <p><strong>Description:</strong> Please prepare your proposal title</p>
+        </div>
+        <div class="meeting-actions">
+          <button @click="editAssignment(assignment)" class="button small-button">Edit</button>
+          <button @click="deleteAssignment(assignment.id)" class="button small-button delete-button">Delete</button>
+        </div>
+      </div>
+    </div>
 
-    
 
-  </div>
 
 </template>
 
@@ -107,5 +119,38 @@ export default {
 
 .button:hover {
   background-color: #0056b3;
+}
+
+.meeting-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.meeting-item {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #ced4da;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meeting-details h3 {
+  margin: 0 0 10px 0;
+}
+
+.meeting-details p {
+  margin: 5px 0;
+}
+
+.meeting-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.meeting-actions .button {
+  margin-top: 5px;
 }
 </style>
