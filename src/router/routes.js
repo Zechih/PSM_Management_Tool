@@ -9,12 +9,38 @@ import StudentGradePage from "@/pages/StudentGradePage.vue"; // Import the Stude
 import LecturerDashboard from "@/pages/LecturerDashboard.vue"; // Import the LecturerDashboard component
 import LecturerGradePage from "@/pages/LecturerGradePage.vue"; // Import the LecturerGradePage component
 
+//auth pages
+import WelcomePage from "@/pages/Auth/Welcome.vue";
+import LoginPage from "@/pages/Auth/Login.vue";
+import RegisterPage from "@/pages/Auth/Register.vue";
+import Dashboard from "@/pages/Dashboard.vue"
+
 const routes = [
   {
     path: "/",
+    name: "welcome",
+    component: WelcomePage
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: LoginPage
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: RegisterPage
+  },
+  {
+    path: "/", //dont touch
     component: DashboardLayout,
-    redirect: "/profile",
+    redirect: "/dashboard",
     children: [
+      {
+        path: "dashboard",
+        name: "dashboard",
+        component: Dashboard,
+      },
       {
         path: "profile",
         name: "profile",
