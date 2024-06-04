@@ -14,3 +14,4 @@ CREATE TABLE assignments (
     remaining_time VARCHAR(255) NOT NULL,
     file_url VARCHAR(255) NULL
 );
+
