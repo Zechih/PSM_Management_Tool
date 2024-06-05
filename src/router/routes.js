@@ -12,7 +12,8 @@ import Meeting from "@/pages/Meeting.vue";
 import WelcomePage from "@/pages/Auth/Welcome.vue";
 import LoginPage from "@/pages/Auth/Login.vue";
 import RegisterPage from "@/pages/Auth/Register.vue";
-import Dashboard from "@/pages/Dashboard.vue"
+import Dashboard from "@/pages/Dashboard/Dashboard.vue"
+import DashboardCalendar from "@/pages/Dashboard/DashboardCalendar.vue"
 
 const routes = [
   {
@@ -39,6 +40,11 @@ const routes = [
         path: "dashboard",
         name: "dashboard",
         component: Dashboard,
+      },
+      {
+        path: "calendar",
+        name: "calendar",
+        component: DashboardCalendar,
       },
       {
         path: "profile",
