@@ -43,6 +43,8 @@ export default {
       alert("Login successful!");
       // Redirect or perform other actions after successful login
       this.$router.push({ name: "dashboard" });
+      // this.$router.push({ name: "StudentDashboard" });
+      // this.$router.push({ name: "LecturerDashboard" });
     },
     goToRegister() {
       this.$router.push({ name: "register" });

@@ -4,16 +4,17 @@ import UserProfile from "@/pages/UserProfile.vue";
 import Assignment from "@/pages/Assignment.vue";
 import Grade from "@/pages/Grade.vue";
 import Meeting from "@/pages/Meeting.vue";
-import StudentDashboard from "@/pages/StudentDashboard.vue"; // Import the StudentDashboard component
+import StudentDashboard from "@/pages/Dashboard/StudentDashboard.vue"; // Import the StudentDashboard component
 import StudentGradePage from "@/pages/StudentGradePage.vue"; // Import the StudentGradePage component
-import LecturerDashboard from "@/pages/LecturerDashboard.vue"; // Import the LecturerDashboard component
+import LecturerDashboard from "@/pages/Dashboard/LecturerDashboard.vue"; // Import the LecturerDashboard component
 import LecturerGradePage from "@/pages/LecturerGradePage.vue"; // Import the LecturerGradePage component
 
 //auth pages
 import WelcomePage from "@/pages/Auth/Welcome.vue";
 import LoginPage from "@/pages/Auth/Login.vue";
 import RegisterPage from "@/pages/Auth/Register.vue";
-import Dashboard from "@/pages/Dashboard.vue"
+import Dashboard from "@/pages/Dashboard/Dashboard.vue"
+import DashboardCalendar from "@/pages/Dashboard/DashboardCalendar.vue"
 
 const routes = [
   {
@@ -40,6 +41,11 @@ const routes = [
         path: "dashboard",
         name: "dashboard",
         component: Dashboard,
+      },
+      {
+        path: "calendar",
+        name: "calendar",
+        component: DashboardCalendar,
       },
       {
         path: "profile",

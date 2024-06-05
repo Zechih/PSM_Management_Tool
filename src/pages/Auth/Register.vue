@@ -104,7 +104,7 @@ input {
   display: block;
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
+  background-color: #1394bb;
   color: #fff;
   border: none;
   border-radius: 4px;

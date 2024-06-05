@@ -7,7 +7,7 @@
       <div class="author">
         <img
           class="avatar border-white"
-          src="@/assets/img/faces/face-2.jpg"
+          src="@/assets/img/vue-logo.png"
           alt="..."
         />
         <h4 class="title">
@@ -47,20 +47,7 @@
 export default {
   data() {
     return {
-      details: [
-        {
-          title: "12",
-          subTitle: "Files",
-        },
-        {
-          title: "2GB",
-          subTitle: "Used",
-        },
-        {
-          title: "24,6$",
-          subTitle: "Spent",
-        },
-      ],
+      
     };
   },
   methods: {

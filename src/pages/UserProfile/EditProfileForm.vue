@@ -3,16 +3,6 @@
     <div>
       <form @submit.prevent>
         <div class="row">
-          <div class="col-md-5">
-            <fg-input
-              type="text"
-              label="Company"
-              :disabled="true"
-              placeholder="Paper dashboard"
-              v-model="user.company"
-            >
-            </fg-input>
-          </div>
           <div class="col-md-3">
             <fg-input
               type="text"
