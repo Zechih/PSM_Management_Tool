@@ -1,13 +1,22 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
+
 import NotFound from "@/pages/NotFoundPage.vue";
-import UserProfile from "@/pages/UserProfile.vue";
-import Assignment from "@/pages/Assignment.vue";
-import Grade from "@/pages/Grade.vue";
-import Meeting from "@/pages/Meeting.vue";
-import StudentDashboard from "@/pages/Dashboard/StudentDashboard.vue"; // Import the StudentDashboard component
-import StudentGradePage from "@/pages/StudentGradePage.vue"; // Import the StudentGradePage component
-import LecturerDashboard from "@/pages/Dashboard/LecturerDashboard.vue"; // Import the LecturerDashboard component
-import LecturerGradePage from "@/pages/LecturerGradePage.vue"; // Import the LecturerGradePage component
+
+import UserProfile from "@/pages/Profile/UserProfile.vue";
+
+import Assignment from "@/pages/Assignment/Assignment.vue";
+import StudentAssignment from "@/pages/Assignment/StudentAssignment.vue";
+import LecturerAssignment from "@/pages/Assignment/LecturerAssignment.vue";
+
+import Grade from "@/pages/Grade/Grade.vue";
+import StudentGradePage from "@/pages/Grade/StudentGradePage.vue"; 
+import LecturerGradePage from "@/pages/Grade/LecturerGradePage.vue"; 
+import StudentDashboard from "@/pages/Grade/StudentGradeDashboard.vue"; 
+import LecturerDashboard from "@/pages/Grade/LecturerGradeDashboard.vue"; 
+
+import Meeting from "@/pages/Meeting/Meeting.vue";
+import StudentMeeting from "@/pages/Meeting/StudentMeeting.vue";
+import LecturerMeeting from "@/pages/Meeting/LecturerMeeting.vue";
 
 //auth pages
 import WelcomePage from "@/pages/Auth/Welcome.vue";
@@ -58,6 +67,16 @@ const routes = [
         component: Meeting,
       },
       {
+        path: "meeting",
+        name: "StudentMeeting",
+        component: StudentMeeting,
+      },
+      {
+        path: "meeting",
+        name: "LecturerMeeting",
+        component: LecturerMeeting,
+      },
+      {
         path: "grade",
         name: "grade",
         component: Grade,
@@ -66,6 +85,16 @@ const routes = [
         path: "assignment",
         name: "assignment",
         component: Assignment,
+      },
+      {
+        path: "student/assignment",
+        name: "StudentAssignment",
+        component: StudentAssignment,
+      },
+      {
+        path: "lecturer/assignment",
+        name: "LecturerAssignment",
+        component: LecturerAssignment,
       },
       {
         path: "lecturer/dashboard", // Define the route for the lecturer dashboard

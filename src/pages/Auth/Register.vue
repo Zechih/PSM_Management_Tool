@@ -18,7 +18,7 @@
         </div>
         <div class="form-group">
           <label for="confirm-password">Confirm Password:</label>
-          <input type="password" id="password" v-model="password" required />
+          <input type="password" id="confirmPassword" v-model="confirmPassword" required />
         </div>
         <button type="submit" class="btn">Register</button>
       </form>
@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<script>
+<!-- <script>
 export default {
   data() {
     return {
@@ -53,6 +53,54 @@ export default {
       this.$router.push({ name: "login" });
     },
   },
+};
+</script> -->
+
+<script>
+export default {
+  data() {
+    return {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      error: null,
+    };
+  },
+  methods: {
+    async register() {
+      this.error = null;
+      if (this.password !== this.confirmPassword) {
+        this.error = "Passwords do not match.";
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost/PSM_api_server/authentication/register.php/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: this.username,
+            email: this.email,
+            password: this.password,
+            confirmPassword: this.confirmPassword
+          })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert("Registration successful!");
+          this.$router.push({ name: "login" });
+        } else {
+          this.error = result.error;
+        }
+      } catch (error) {
+        this.error = "An error occurred. Please try again.";
+      }
+    }
+  }
 };
 </script>
 

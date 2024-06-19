@@ -7,17 +7,47 @@
     </div>
 
     <div class="overlay" v-if="showForm">
-        <span class="close" @click="cancelForm">&times;</span>
-        <form @submit.prevent="saveToMeetingList" class="form">
-          <input v-model="newMeeting.Mtitle" placeholder="Title" class="input" :class="{ 'is-invalid': !validMtitle }"/><br>
-          <input type="datetime-local" v-model="newMeeting.Mdate" placeholder="Date and Time" class="input" :class="{ 'is-invalid': !validMdate }"/><br>
-          <input v-model="newMeeting.Mduration" placeholder="Duration" class="input" :class="{ 'is-invalid': !validMduration }"/><br>
-          <input v-model="newMeeting.Mlocation" placeholder="Location" class="input" :class="{ 'is-invalid': !validMlocation }"/><br>
-          <textarea v-model="newMeeting.Mdescription" placeholder="Description" class="input" :class="{ 'is-invalid': !validMdescription }"></textarea><br>
-          <button type="submit" class="button" :disabled="!formIsValid">{{ editMode ? 'Update Meeting' : 'Save Meeting' }}</button>
-          <button type="button" @click="cancelForm" class="button cancel-button">Cancel</button>
-        </form>
-
+      <span class="close" @click="cancelForm">&times;</span>
+      <form @submit.prevent="saveToMeetingList" class="form">
+        <input
+          v-model="newMeeting.Mtitle"
+          placeholder="Title"
+          class="input"
+          :class="{ 'is-invalid': !validMtitle }"
+        /><br />
+        <input
+          type="datetime-local"
+          v-model="newMeeting.Mdate"
+          placeholder="Date and Time"
+          class="input"
+          :class="{ 'is-invalid': !validMdate }"
+        /><br />
+        <input
+          v-model="newMeeting.Mduration"
+          placeholder="Duration"
+          class="input"
+          :class="{ 'is-invalid': !validMduration }"
+        /><br />
+        <input
+          v-model="newMeeting.Mlocation"
+          placeholder="Location"
+          class="input"
+          :class="{ 'is-invalid': !validMlocation }"
+        /><br />
+        <textarea
+          v-model="newMeeting.Mdescription"
+          placeholder="Description"
+          class="input"
+          :class="{ 'is-invalid': !validMdescription }"
+        ></textarea
+        ><br />
+        <button type="submit" class="button" :disabled="!formIsValid">
+          {{ editMode ? "Update Meeting" : "Save Meeting" }}
+        </button>
+        <button type="button" @click="cancelForm" class="button cancel-button">
+          Cancel
+        </button>
+      </form>
     </div>
 
     <div class="meeting-list">
@@ -29,7 +59,9 @@
         <p><strong>Description:</strong> Please prepare your proposal title</p>
         <div class="meeting-actions">
           <button @click="" class="button small-button">Edit</button>
-          <button @click="" class="button small-button delete-button">Delete</button>
+          <button @click="" class="button small-button delete-button">
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -40,34 +72,34 @@
 export default {
   data() {
     return {
-      showForm: false, 
+      showForm: false,
       editMode: false,
       meetings: [],
       newMeeting: {
-        Mtitle: '',
-        Mdate: '',
-        Mduration: '',
-        Mlocation: '',
-        Mdescription: '',
-        McreatedBy: ''
-      }
+        Mtitle: "",
+        Mdate: "",
+        Mduration: "",
+        Mlocation: "",
+        Mdescription: "",
+        McreatedBy: "",
+      },
     };
   },
   computed: {
     validMtitle() {
-      return this.newMeeting.Mtitle.trim() !== '';
+      return this.newMeeting.Mtitle.trim() !== "";
     },
     validMdate() {
-      return this.newMeeting.Mdate !== '';
+      return this.newMeeting.Mdate !== "";
     },
     validMduration() {
-      return this.newMeeting.Mduration.trim() !== '';
+      return this.newMeeting.Mduration.trim() !== "";
     },
     validMlocation() {
-      return this.newMeeting.Mlocation.trim() !== '';
+      return this.newMeeting.Mlocation.trim() !== "";
     },
     validMdescription() {
-      return this.newMeeting.Mdescription.trim() !== '';
+      return this.newMeeting.Mdescription.trim() !== "";
     },
     formIsValid() {
       return (
@@ -77,16 +109,16 @@ export default {
         this.validMlocation &&
         this.validMdescription
       );
-    }
+    },
   },
   methods: {
     saveToMeetingList() {
-      this.showForm = false; 
+      this.showForm = false;
     },
     cancelForm() {
-      this.showForm = false; 
+      this.showForm = false;
     },
-  }
+  },
 };
 </script>
 

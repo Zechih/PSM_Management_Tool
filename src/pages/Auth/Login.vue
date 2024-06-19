@@ -32,19 +32,44 @@ export default {
     };
   },
   methods: {
-    login() {
+    async login() {
       this.error = null;
-      // Simulate login process
-      if (this.username !== "admin" || this.password !== "password") {
-        this.error = "Invalid username or password. Please try again.";
-        return;
+      try {
+        const response = await fetch("http://localhost/PSM_api_server/authentication/login.php/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: this.username,
+            password: this.password,
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          // Store the token in local storage
+          localStorage.setItem("token", data.token);
+
+          // Decode the token to get user role
+          const payload = JSON.parse(atob(data.token.split(".")[1]));
+          const role = payload.role;
+
+          // Redirect based on user role
+          if (role === "lecturer") {
+            this.$router.push({ name: "dashboard" });
+          } else {
+            this.$router.push({ name: "dashboard" });
+          }
+        } else if (response.status === 404) {
+          this.error = "Username not found. Please try again.";
+        } else {
+          this.error = data.error || "Invalid username or password.";
+        }
+      } catch (error) {
+        console.error(error);
+        this.error = "An error occurred. Please try again.";
       }
-      // Proceed with login if the credentials are correct
-      alert("Login successful!");
-      // Redirect or perform other actions after successful login
-      this.$router.push({ name: "dashboard" });
-      // this.$router.push({ name: "StudentDashboard" });
-      // this.$router.push({ name: "LecturerDashboard" });
     },
     goToRegister() {
       this.$router.push({ name: "register" });
@@ -52,6 +77,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
   .login-container {
