@@ -7,7 +7,7 @@
       <div class="author">
         <img
           class="avatar border-white"
-          src="@/assets/img/vue-logo.png"
+          src="@/assets/img/profile_pic.png"
           alt="..."
         />
         <h4 class="title">
@@ -118,14 +118,19 @@
             </div>
           </div>
         </div>
+        <div class = "text-center">
         <div class="text-center">
-          <p-button type="info" round @click.native.prevent="updateProfile">
+          <p-button type="info" round @click.native.prevent="updateProfile" style="margin-right: 10px;">
             Update Profile
           </p-button>
+          <p-button type="info" round @click.native.prevent="deleteAccount" style="margin-left: 10px; background-color: red">
+            Delete Account
+          </p-button>
+        </div>
         </div>
         <br />
         <div class="text-center">
-          <p-button type="info" round @click.native.prevent="logout">
+          <p-button type="info" round @click.native.prevent="logout" style="margin-left: 10px; background-color: grey">
             Logout
           </p-button>
         </div>
@@ -215,6 +220,34 @@ export default {
         console.error(error);
       }
     },
+    async deleteAccount() {
+    try {
+        if (confirm("Are you sure you want to delete your account?")) {
+            const token = localStorage.getItem("token");
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            const userId = payload.user_id;
+
+            const response = await fetch(`http://localhost/PSM_api_server/authentication/profile.php/profile/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert("Account deleted successfully");
+
+                // Clear the token and navigate to the welcome page
+                localStorage.removeItem("token");
+                this.$router.push({ name: "welcome" });
+            } else {
+                console.error(data.message);
+            }
+        }
+    } catch (error) {
+        console.error(error);
+    }
+},
     logout() {
       // Clear the token from localStorage
       localStorage.removeItem("token");
