@@ -7,7 +7,7 @@ import UserProfile from "@/pages/UserProfile.vue";
 import Assignment from "@/pages/Assignment.vue";
 import Grade from "@/pages/Grade.vue";
 import Meeting from "@/pages/Meeting.vue";
-
+import AssignmentUser from "@/pages/Assignment_user.vue";
 //auth pages
 import WelcomePage from "@/pages/Auth/Welcome.vue";
 import LoginPage from "@/pages/Auth/Login.vue";
@@ -61,6 +61,11 @@ const routes = [
         path: "assignment",
         name: "assignment",
         component: Assignment,
+      },
+      {
+        path: "assignmentuser",
+        name: "assignmentuser",
+        component: AssignmentUser
       },
     ],
   },
