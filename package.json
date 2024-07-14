@@ -11,11 +11,15 @@
     "dev": "npm run serve"
   },
   "dependencies": {
+    "axios": "^1.7.2",
     "bootstrap": "4.6.2",
     "chartist": "0.11.0",
     "es6-promise": "4.2.8",
     "eslint-plugin-vue": "^9.8.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "vue": "2.7.14",
+    "vue-cal": "^3.0.0",
     "vue-clickaway": "2.2.2",
     "vue-notifyjs": "0.3.0",
     "vue-router": "3.0.1"

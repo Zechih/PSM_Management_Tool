@@ -1,5 +1,5 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
-// GeneralViews
+
 import NotFound from "@/pages/NotFoundPage.vue";
 
 // Admin pages
@@ -7,12 +7,13 @@ import UserProfile from "@/pages/UserProfile.vue";
 import Assignment from "@/pages/Assignment.vue";
 import Grade from "@/pages/Grade.vue";
 import Meeting from "@/pages/Meeting.vue";
-import AssignmentUser from "@/pages/Assignment_user.vue";
+
 //auth pages
 import WelcomePage from "@/pages/Auth/Welcome.vue";
 import LoginPage from "@/pages/Auth/Login.vue";
 import RegisterPage from "@/pages/Auth/Register.vue";
-import Dashboard from "@/pages/Dashboard.vue"
+import Dashboard from "@/pages/Dashboard/Dashboard.vue"
+import DashboardCalendar from "@/pages/Dashboard/DashboardCalendar.vue"
 
 const routes = [
   {
@@ -41,17 +42,30 @@ const routes = [
         component: Dashboard,
       },
       {
+        path: "calendar",
+        name: "calendar",
+        component: DashboardCalendar,
+      },
+      {
         path: "profile",
         name: "profile",
         component: UserProfile,
       },
-
       {
         path: "meeting",
         name: "meeting",
         component: Meeting,
       },
-
+      {
+        path: "meeting",
+        name: "StudentMeeting",
+        component: StudentMeeting,
+      },
+      {
+        path: "meeting",
+        name: "LecturerMeeting",
+        component: LecturerMeeting,
+      },
       {
         path: "grade",
         name: "grade",
@@ -62,23 +76,9 @@ const routes = [
         name: "assignment",
         component: Assignment,
       },
-      {
-        path: "assignmentuser",
-        name: "assignmentuser",
-        component: AssignmentUser
-      },
     ],
   },
   { path: "*", component: NotFound },
 ];
-
-/**
- * Asynchronously load view (Webpack Lazy loading compatible)
- * The specified component must be inside the Views folder
- * @param  {string} name  the filename (basename) of the view to load.
-function view(name) {
-   var res= require('../components/Dashboard/Views/' + name + '.vue');
-   return res;
-};**/
 
 export default routes;
