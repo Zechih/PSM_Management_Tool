@@ -44,6 +44,7 @@
         <button type="submit" class="button" :disabled="!formIsValid">
           {{ editMode ? "Update Meeting" : "Save Meeting" }}
         </button>
+        &nbsp;
         <button type="button" @click="cancelForm" class="button cancel-button">
           Cancel
         </button>
@@ -51,17 +52,26 @@
     </div>
 
     <div class="meeting-list">
-      <div class="meeting-details">
-        <h3>Proposal Discussion</h3>
-        <p><strong>Date and Time:</strong> 5/6/2024 11.00am</p>
-        <p><strong>Duration:</strong> 1 hour</p>
-        <p><strong>Location:</strong> Webex</p>
-        <p><strong>Description:</strong> Please prepare your proposal title</p>
-        <div class="meeting-actions">
-          <button @click="" class="button small-button">Edit</button>
-          <button @click="" class="button small-button delete-button">
-            Delete
-          </button>
+      <div v-for="meeting in meetings" :key="meeting.id" class="meeting-details">
+        <div class="column">
+          <h3>{{ meeting.Mtitle }}</h3>
+        </div>
+        <div class="column">
+          <div>
+            <p><strong>Date and Time:</strong> {{ meeting.Mdate }}</p>
+            <p><strong>Duration:</strong> {{ meeting.Mduration }}</p>
+            <p><strong>Location:</strong> {{ meeting.Mlocation }}</p>
+          </div>
+          <div>
+            <p><strong>Description:</strong></p>
+            <p>{{ meeting.Mdescription }}</p>
+          </div>
+        </div>
+        <div class="column">
+          <div class="meeting-actions">
+            <button @click="editMeeting(meeting)" class="button small-button">Edit</button>
+            <button @click="deleteMeeting(meeting.id)" class="button small-button delete-button">Delete</button>
+          </div>
         </div>
       </div>
     </div>
@@ -81,8 +91,8 @@ export default {
         Mduration: "",
         Mlocation: "",
         Mdescription: "",
-        McreatedBy: "",
       },
+      editMeetingId: null,
     };
   },
   computed: {
@@ -112,12 +122,107 @@ export default {
     },
   },
   methods: {
-    saveToMeetingList() {
-      this.showForm = false;
+    async fetchMeetings() {
+      try {
+        const response = await fetch("http://localhost/PSM_api_server/meeting/meeting.php/meetings");
+        const data = await response.json();
+        if (response.ok) {
+          if (Array.isArray(data)) {
+            this.meetings = data;
+          } else {
+            console.error("Error: Expected array but got", typeof data);
+          }
+        } else {
+          console.error("Error fetching meetings:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching meetings:", error);
+      }
     },
+
+    async saveToMeetingList() {
+      const url = this.editMode
+        ? `http://localhost/PSM_api_server/meeting/meeting.php/meetings/${this.editMeetingId}`
+        : "http://localhost/PSM_api_server/meeting/meeting.php/meetings";
+      const method = this.editMode ? "PUT" : "POST";
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.newMeeting),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          if (this.editMode) {
+            const index = this.meetings.findIndex(m => m.id === this.editMeetingId);
+            if (index !== -1) {
+              this.meetings[index] = data; 
+            }
+          } else {
+            if (Array.isArray(this.meetings)) {
+              this.meetings.push(data);
+            } else {
+              console.error("Error: `this.meetings` is not an array");
+            }
+          }
+          this.showForm = false;
+          this.resetForm();
+          this.fetchMeetings();
+        } else {
+          console.error("Error saving meeting:", data.message);
+        }
+      } catch (error) {
+        console.error("Error saving meeting:", error);
+      }
+    },
+
+    async deleteMeeting(id) {
+      try {
+        const response = await fetch(`http://localhost/PSM_api_server/meeting/meeting.php/meetings/${id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          this.meetings = this.meetings.filter(m => m.id !== id);
+        } else {
+          console.error("Error deleting meeting:", await response.json());
+        }
+      } catch (error) {
+        console.error("Error deleting meeting:", error);
+      }
+    },
+
+    editMeeting(meeting) {
+      this.newMeeting = { ...meeting };
+      this.editMeetingId = meeting.id;
+      this.editMode = true;
+      this.showForm = true;
+    },
+
     cancelForm() {
+      this.resetForm();
       this.showForm = false;
     },
+
+    resetForm() {
+      this.newMeeting = {
+        Mtitle: "",
+        Mdate: "",
+        Mduration: "",
+        Mlocation: "",
+        Mdescription: "",
+      };
+      this.editMeetingId = null;
+      this.editMode = false;
+    },
+  },
+
+  created() {
+    this.fetchMeetings();
   },
 };
 </script>
@@ -203,7 +308,12 @@ export default {
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* Align items at the top */
+}
+
+.meeting-details .column {
+  flex: 1; /* Take full width of parent */
+  padding: 10px; /* Add padding for spacing */
 }
 
 .meeting-details h3 {
@@ -222,4 +332,5 @@ export default {
 .meeting-actions .button {
   margin-top: 5px;
 }
+
 </style>
