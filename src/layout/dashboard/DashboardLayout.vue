@@ -7,7 +7,6 @@
         <sidebar-link to="/grade" name="Grade" icon="ti-text" />
         <sidebar-link to="/meeting" name="Meeting" icon="ti-pencil-alt2" />
         <sidebar-link to="/profile" name="User Profile" icon="ti-user" />
-        <sidebar-link to="/assignmentuser" name="Assignment User" icon="ti-user" />
 
       </template>
       <!-- <mobile-menu>
