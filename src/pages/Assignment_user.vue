@@ -9,7 +9,6 @@
             <p><strong>Due Date:</strong> {{ formatDateTime(assignment.due_date) }}</p>
             <p><strong>Description:</strong> {{ assignment.description }}</p>
             <p><strong>Remaining Time:</strong> {{ calculateRemainingTime(assignment.set_time, assignment.due_date) }}</p>
-          </div>
         </div>
       </div>
     </div>

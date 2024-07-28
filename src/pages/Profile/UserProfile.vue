@@ -120,7 +120,7 @@
         </div>
         <div class = "text-center">
         <div class="text-center">
-          <p-button type="info" round @click.native.prevent="updateProfile" style="margin-right: 10px;">
+          <p-button type="info" round @click.native.prevent="updateProfile" style="margin-right: 10px; background-color: #1394bb">
             Update Profile
           </p-button>
           <p-button type="info" round @click.native.prevent="deleteAccount" style="margin-left: 10px; background-color: red">

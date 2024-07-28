@@ -16,8 +16,12 @@
           :key="assignment.id"
           class="timeline-item"
         >
-          <h3>{{ assignment.title }}</h3>
-          <p>{{ assignment.dueDate }}</p>
+          <div class="assignment-details">
+            <h3>{{ assignment.name }}</h3>
+            <p><strong>Set Date:</strong> {{ formatDateTime(assignment.set_time) }}</p>
+            <p><strong>Due Date:</strong> {{ formatDateTime(assignment.due_date) }}</p>
+            <p><strong>Remaining Time:</strong> {{ calculateRemainingTime(assignment.set_time, assignment.due_date) }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -38,7 +42,7 @@ export default {
   },
   data() {
     return {
-      selectedMonth: "January",
+      selectedMonth: "",
       months: [
         "January",
         "February",
@@ -53,29 +57,68 @@ export default {
         "November",
         "December",
       ],
-      assignments: [
-        { id: 1, title: "Assignment 1", dueDate: "2023-01-15" },
-        { id: 2, title: "Assignment 2", dueDate: "2023-02-20" },
-        // Add more assignments here
-      ],
+      assignments: [],
+      filteredAssignments: [], // Initialize filteredAssignments
+      error: "",
     };
-  },
-  computed: {
-    filteredAssignments() {
-      return this.assignments.filter((assignment) => {
-        const assignmentMonth = new Date(assignment.dueDate).toLocaleString(
-          "default",
-          { month: "long" },
-        );
-        return assignmentMonth === this.selectedMonth;
-      });
-    },
   },
   methods: {
     filterTimeline() {
-      // This method will be called whenever the selected month changes
+      const month = this.selectedMonth;
+      this.filteredAssignments = this.assignments.filter(assignment => {
+        const dueDate = new Date(assignment.due_date);
+        const assignmentMonth = dueDate.toLocaleString("default", { month: "long" });
+        return assignmentMonth === month;
+      });
+    },
+    async fetchAll() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('http://localhost/PSM_api_server/assignment/assignment.php/getassignmentlist', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          this.assignments = data;
+          this.filterTimeline(); // Ensure filtered assignments are updated after fetching
+        } else {
+          this.error = data.message;
+        }
+      } catch (error) {
+        this.error = "An error occurred. Please try again.";
+      }
+    },
+    formatDateTime(dateTime) {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+      return new Date(dateTime).toLocaleDateString('en-GB', options);
+    },
+    calculateRemainingTime(setTime, dueDate) {
+      const setDateTime = new Date(setTime);
+      const dueDateTime = new Date(dueDate);
+      const remainingTime = dueDateTime - setDateTime;
+
+      if (isNaN(remainingTime)) {
+        return '';
+      }
+
+      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
+
+      return `${days}d ${hours}h ${minutes}m`;
+    },
+    setDefaultMonth() {
+      const currentMonth = new Date().toLocaleString("default", { month: "long" });
+      this.selectedMonth = currentMonth;
     },
   },
+  mounted() {
+    this.setDefaultMonth(); // Set the default month when the component mounts
+    this.fetchAll();
+  }
 };
 </script>
 
