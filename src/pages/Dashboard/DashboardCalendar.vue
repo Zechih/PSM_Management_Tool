@@ -7,7 +7,7 @@
       <button @click="nextMonth">Next</button>
     </div>
     <div class="calendar-grid">
-      <div v-for="day in daysInMonth" :key="day" :class="{ 'calendar-day': true, 'current-day': day === currentDate }">
+      <div v-for="day in daysInMonth" :key="day" :class="{ 'calendar-day': true, 'current-day': isCurrentDay(day) }">
         {{ day }}
       </div>
     </div>
@@ -49,6 +49,12 @@ export default {
       } else {
         this.currentMonth++;
       }
+    },
+    isCurrentDay(day) {
+      // Check if the day is in the current month and matches the current system day
+      return this.currentMonth === new Date().getMonth() &&
+             this.currentYear === new Date().getFullYear() &&
+             day === this.currentDate;
     }
   }
 };

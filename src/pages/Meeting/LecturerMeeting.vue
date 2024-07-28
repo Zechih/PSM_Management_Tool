@@ -1,81 +1,76 @@
 <template>
   <div class="container">
-    <h1 class="header">Assignment Management</h1>
+    <h1 class="header">Meeting Management</h1>
 
     <div class="button-group">
-      <button @click="showForm = true" class="button">Add New Assignment</button>
+      <button style="background-color: #1394bb" @click="showForm = true" class="button">Add New Meeting</button>
     </div>
 
     <div class="overlay" v-if="showForm">
       <span class="close" @click="cancelForm">&times;</span>
-      <form @submit.prevent="saveToAssignmentList" class="form" enctype="multipart/form-data">
+      <form @submit.prevent="saveToMeetingList" class="form">
         <input
-          v-model="newAssignment.name"
-          placeholder="Name"
+          v-model="newMeeting.Mtitle"
+          placeholder="Title"
           class="input"
-          :class="{ 'is-invalid': !validName }"
+          :class="{ 'is-invalid': !validMtitle }"
         /><br />
         <input
           type="datetime-local"
-          v-model="newAssignment.set_time"
-          placeholder="Set Time"
+          v-model="newMeeting.Mdate"
+          placeholder="Date and Time"
           class="input"
-          :class="{ 'is-invalid': !validSetTime }"
+          :class="{ 'is-invalid': !validMdate }"
         /><br />
         <input
-          type="datetime-local"
-          v-model="newAssignment.due_date"
-          placeholder="Due Date"
+          v-model="newMeeting.Mduration"
+          placeholder="Duration"
           class="input"
-          :class="{ 'is-invalid': !validDueDate }"
+          :class="{ 'is-invalid': !validMduration }"
         /><br />
         <input
-          v-model="newAssignment.remaining_time"
-          placeholder="Remaining Time"
+          v-model="newMeeting.Mlocation"
+          placeholder="Location"
           class="input"
-          :class="{ 'is-invalid': !validRemainingTime }"
+          :class="{ 'is-invalid': !validMlocation }"
         /><br />
         <textarea
-          v-model="newAssignment.description"
+          v-model="newMeeting.Mdescription"
           placeholder="Description"
           class="input"
-          :class="{ 'is-invalid': !validDescription }"
+          :class="{ 'is-invalid': !validMdescription }"
         ></textarea
         ><br />
-        <input type="file" @change="handleFileUpload" /><br />
-        <button type="submit" class="button" :disabled="!formIsValid">
-          {{ editMode ? "Update Assignment" : "Save Assignment" }}
+        <button style="background-color: #1394bb" type="submit" class="button" :disabled="!formIsValid">
+          {{ editMode ? "Update Meeting" : "Save Meeting" }}
         </button>
         &nbsp;
-        <button type="button" @click="cancelForm" class="button cancel-button">
+        <button style="background-color: red" type="button" @click="cancelForm" class="button cancel-button">
           Cancel
         </button>
       </form>
     </div>
 
-    <div class="assignment-list">
-      <div v-for="assignment in assignments" :key="assignment.id" class="assignment-details">
+    <div class="meeting-list">
+      <div v-for="meeting in meetings" :key="meeting.id" class="meeting-details">
         <div class="column">
-          <h3>{{ assignment.name }}</h3>
+          <h3>{{ meeting.Mtitle }}</h3>
         </div>
         <div class="column">
           <div>
-            <p><strong>Set Time:</strong> {{ assignment.set_time }}</p>
-            <p><strong>Due Date:</strong> {{ assignment.due_date }}</p>
-            <p><strong>Remaining Time:</strong> {{ assignment.remaining_time }}</p>
+            <p><strong>Date and Time:</strong> {{ meeting.Mdate }}</p>
+            <p><strong>Duration:</strong> {{ meeting.Mduration }}</p>
+            <p><strong>Location:</strong> {{ meeting.Mlocation }}</p>
           </div>
           <div>
             <p><strong>Description:</strong></p>
-            <p>{{ assignment.description }}</p>
-          </div>
-          <div v-if="assignment.file_url">
-            <p><strong>File:</strong> <a :href="'/uploads/' + assignment.file_url" target="_blank">View File</a></p>
+            <p>{{ meeting.Mdescription }}</p>
           </div>
         </div>
         <div class="column">
-          <div class="assignment-actions">
-            <button @click="editAssignment(assignment)" class="button small-button">Edit</button>
-            <button @click="deleteAssignment(assignment.id)" class="button small-button delete-button">Delete</button>
+          <div class="meeting-actions">
+            <button style="background-color: #1394bb" @click="editMeeting(meeting)" class="button small-button">Edit</button>
+            <button style="background-color: red"@click="deleteMeeting(meeting.id)" class="button small-button delete-button">Delete</button>
           </div>
         </div>
       </div>
@@ -89,155 +84,145 @@ export default {
     return {
       showForm: false,
       editMode: false,
-      assignments: [],
-      newAssignment: {
-        name: "",
-        set_time: "",
-        due_date: "",
-        remaining_time: "",
-        description: "",
-        file: null,
+      meetings: [],
+      newMeeting: {
+        Mtitle: "",
+        Mdate: "",
+        Mduration: "",
+        Mlocation: "",
+        Mdescription: "",
       },
-      editAssignmentId: null,
+      editMeetingId: null,
     };
   },
   computed: {
-    validName() {
-      return this.newAssignment.name.trim() !== "";
+    validMtitle() {
+      return this.newMeeting.Mtitle.trim() !== "";
     },
-    validSetTime() {
-      return this.newAssignment.set_time !== "";
+    validMdate() {
+      return this.newMeeting.Mdate !== "";
     },
-    validDueDate() {
-      return this.newAssignment.due_date !== "";
+    validMduration() {
+      return this.newMeeting.Mduration.trim() !== "";
     },
-    validRemainingTime() {
-      return this.newAssignment.remaining_time.trim() !== "";
+    validMlocation() {
+      return this.newMeeting.Mlocation.trim() !== "";
     },
-    validDescription() {
-      return this.newAssignment.description.trim() !== "";
+    validMdescription() {
+      return this.newMeeting.Mdescription.trim() !== "";
     },
     formIsValid() {
       return (
-        this.validName &&
-        this.validSetTime &&
-        this.validDueDate &&
-        this.validRemainingTime &&
-        this.validDescription
+        this.validMtitle &&
+        this.validMdate &&
+        this.validMduration &&
+        this.validMlocation &&
+        this.validMdescription
       );
     },
   },
   methods: {
-    async fetchAssignments() {
+    async fetchMeetings() {
       try {
-        const response = await fetch("http://localhost/PSM_api_server/assignment/assignment.php/getassignmentlist");
+        const response = await fetch("http://localhost/PSM_api_server/meeting/meeting.php/meetings");
         const data = await response.json();
         if (response.ok) {
           if (Array.isArray(data)) {
-            this.assignments = data;
+            this.meetings = data;
           } else {
             console.error("Error: Expected array but got", typeof data);
           }
         } else {
-          console.error("Error fetching assignments:", data.message);
+          console.error("Error fetching meetings:", data.message);
         }
       } catch (error) {
-        console.error("Error fetching assignments:", error);
+        console.error("Error fetching meetings:", error);
       }
     },
 
-    handleFileUpload(event) {
-      this.newAssignment.file = event.target.files[0];
-    },
-
-    async saveToAssignmentList() {
+    async saveToMeetingList() {
       const url = this.editMode
-        ? `http://localhost/PSM_api_server/assignment/assignment.php/updateassignment/${this.editAssignmentId}`
-        : "http://localhost/PSM_api_server/assignment/assignment.php/createassignment";
+        ? `http://localhost/PSM_api_server/meeting/meeting.php/meetings/${this.editMeetingId}`
+        : "http://localhost/PSM_api_server/meeting/meeting.php/meetings";
       const method = this.editMode ? "PUT" : "POST";
-
-      const formData = new FormData();
-      formData.append("name", this.newAssignment.name);
-      formData.append("set_time", this.newAssignment.set_time);
-      formData.append("due_date", this.newAssignment.due_date);
-      formData.append("remaining_time", this.newAssignment.remaining_time);
-      formData.append("description", this.newAssignment.description);
-      if (this.newAssignment.file) {
-        formData.append("file", this.newAssignment.file);
-      }
 
       try {
         const response = await fetch(url, {
           method: method,
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.newMeeting),
         });
 
         const data = await response.json();
         if (response.ok) {
           if (this.editMode) {
-            const index = this.assignments.findIndex(a => a.id === this.editAssignmentId);
+            const index = this.meetings.findIndex(m => m.id === this.editMeetingId);
             if (index !== -1) {
-              this.assignments[index] = data;
+              this.meetings[index] = data; 
             }
           } else {
-            this.assignments.push(data);
+            if (Array.isArray(this.meetings)) {
+              this.meetings.push(data);
+            } else {
+              console.error("Error: `this.meetings` is not an array");
+            }
           }
           this.showForm = false;
           this.resetForm();
-          this.fetchAssignments();
+          this.fetchMeetings();
         } else {
-          console.error("Error saving assignment:", data.message);
+          console.error("Error saving meeting:", data.message);
         }
       } catch (error) {
-        console.error("Error saving assignment:", error);
+        console.error("Error saving meeting:", error);
       }
+    },
+
+    async deleteMeeting(id) {
+      try {
+        const response = await fetch(`http://localhost/PSM_api_server/meeting/meeting.php/meetings/${id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          this.meetings = this.meetings.filter(m => m.id !== id);
+        } else {
+          console.error("Error deleting meeting:", await response.json());
+        }
+      } catch (error) {
+        console.error("Error deleting meeting:", error);
+      }
+    },
+
+    editMeeting(meeting) {
+      this.newMeeting = { ...meeting };
+      this.editMeetingId = meeting.id;
+      this.editMode = true;
+      this.showForm = true;
     },
 
     cancelForm() {
-      this.showForm = false;
       this.resetForm();
+      this.showForm = false;
     },
 
     resetForm() {
-      this.newAssignment = {
-        name: "",
-        set_time: "",
-        due_date: "",
-        remaining_time: "",
-        description: "",
-        file: null,
+      this.newMeeting = {
+        Mtitle: "",
+        Mdate: "",
+        Mduration: "",
+        Mlocation: "",
+        Mdescription: "",
       };
+      this.editMeetingId = null;
       this.editMode = false;
-      this.editAssignmentId = null;
-    },
-
-    editAssignment(assignment) {
-      this.showForm = true;
-      this.editMode = true;
-      this.editAssignmentId = assignment.id;
-      this.newAssignment = { ...assignment, file: null }; // Reset file
-    },
-
-    async deleteAssignment(id) {
-      if (confirm("Are you sure you want to delete this assignment?")) {
-        try {
-          const response = await fetch(`http://localhost/PSM_api_server/assignment/assignment.php/deleteassignment/${id}`, {
-            method: "DELETE",
-          });
-          if (response.ok) {
-            this.assignments = this.assignments.filter(a => a.id !== id);
-          } else {
-            const data = await response.json();
-            console.error("Error deleting assignment:", data.message);
-          }
-        } catch (error) {
-          console.error("Error deleting assignment:", error);
-        }
-      }
     },
   },
-  mounted() {
-    this.fetchAssignments();
+
+  created() {
+    this.fetchMeetings();
   },
 };
 </script>
@@ -284,6 +269,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000; /* Ensure it's on top of other content */
 }
 
 .modal {
@@ -302,12 +288,19 @@ export default {
 }
 
 .input {
-  margin-bottom: 10px;
+  align-items: center;
+  margin-bottom: 15px;
+  width: 100%;
 }
 
 .form {
-  max-width: 400px;
-  width: 100%;
+  background-color: #ffffff; /* Ensure the form has a solid background */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3); /* Add shadow effect */
+  position: relative;
+  z-index: 1001; /* Ensure it's above the overlay */
+  width: 35%;
 }
 
 .meeting-list {

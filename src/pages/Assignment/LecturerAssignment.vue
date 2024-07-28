@@ -3,14 +3,14 @@
     <h1 class="header">Assignment Management</h1>
 
     <div class="button-group">
-      <button @click="startNewAssignment" class="button">Create New Assignment</button>
+      <button @click="startNewAssignment" style="background-color: #1394bb" class="button">Create New Assignment</button>
     </div>
 
-    <form v-if="showForm" @submit.prevent="saveToAssignmentList" class="form">
+    <form v-if="showForm" @submit.prevent="editMode ? updateAssignment() : createAssignment()" class="form">
       <input v-model="newAssignment.name" placeholder="Name" class="input" :class="{ 'is-invalid': !validName }"/><br>
       <div class="input-group">
         <input type="datetime-local" v-model="newAssignment.set_time" placeholder="Set Date" class="input" :class="{ 'is-invalid': !validSetTime }"/>
-        <button type="button" @click="setCurrentTime" class="button small-button">Set Current Time</button>
+        <button type="button" style="background-color: #1394bb" @click="setCurrentTime" class="button small-button">Set Current Time</button>
       </div>
       <input type="datetime-local" v-model="newAssignment.due_date" placeholder="Due Date" class="input" :class="{ 'is-invalid': !validDueDate }"/><br>
       <input v-model="newAssignment.description" placeholder="Description" class="input" :class="{ 'is-invalid': !validDescription }"/><br>
@@ -18,7 +18,7 @@
         Remaining Time: {{ calculatedRemainingTime }}
       </div>
       <input type="file" @change="handleFileUpload" class="input"/><br>
-      <button type="submit" class="button" :disabled="!formIsValid">{{ editMode ? 'Update Assignment' : 'Save Assignment' }}</button>
+      <button type="submit" style="background-color: #1394bb" class="button" :disabled="!formIsValid">{{ editMode ? 'Update Assignment' : 'Save Assignment' }}</button>
       <button type="button" @click="cancelForm" class="button cancel-button">Cancel</button>
     </form>
 
@@ -30,10 +30,10 @@
           <p><strong>Due Date:</strong> {{ formatDateTime(assignment.due_date) }}</p>
           <p><strong>Description:</strong> {{ assignment.description }}</p>
           <p><strong>Remaining Time:</strong> {{ calculateRemainingTime(assignment.set_time, assignment.due_date) }}</p>
-          <p v-if="assignment.file_url"><strong>File:</strong> <a :href="'/uploads/' + assignment.file_url" target="_blank">Download</a></p>
+          <p v-if="assignment.file_name"><strong>File: </strong> {{ assignment.file_name }} <button style="background-color: #1394bb" @click="downloadFile(assignment.id)" class="button small-button">Download</button></p>
         </div>
         <div class="assignment-actions">
-          <button @click="editAssignment(assignment)" class="button small-button">Edit</button>
+          <button style="background-color: #1394bb" @click="editAssignment(assignment)" class="button small-button">Edit</button>
           <button @click="deleteAssignment(assignment.id)" class="button small-button delete-button">Delete</button>
         </div>
       </div>
@@ -51,11 +51,13 @@ export default {
     return {
       assignments: [],
       newAssignment: {
+        id: null,
         name: '',
         set_time: '',
         due_date: '',
         description: '',
         remaining_time: '',
+        file_name: '',
         file: null // Add file attribute
       },
       showForm: false,
@@ -98,6 +100,7 @@ export default {
         const data = await response.json();
         if (response.ok) {
           this.assignments = data;
+          console.log("Assignments fetched:", this.assignments); // Debugging: Check the fetched data
         } else {
           this.error = data.message;
         }
@@ -108,16 +111,63 @@ export default {
     startNewAssignment() {
       this.showForm = true;
       this.editMode = false;
+      this.newAssignment = { // Reset newAssignment for creating a new assignment
+        id: null,
+        name: '',
+        set_time: '',
+        due_date: '',
+        description: '',
+        remaining_time: '',
+        file_name: '',
+        file: null
+      };
     },
     handleFileUpload(event) {
       this.newAssignment.file = event.target.files[0];
     },
-    async saveToAssignmentList() {
+    async createAssignment() {
+      this.newAssignment.remaining_time = this.calculatedRemainingTime;
+
+      const token = localStorage.getItem('token');
+      const url = 'http://localhost/PSM_api_server/assignment/assignment.php/createassignment';
+
+      const formData = new FormData();
+      formData.append('name', this.newAssignment.name);
+      formData.append('set_time', this.newAssignment.set_time);
+      formData.append('due_date', this.newAssignment.due_date);
+      formData.append('description', this.newAssignment.description);
+      formData.append('remaining_time', this.newAssignment.remaining_time);
+      if (this.newAssignment.file) {
+        formData.append('file', this.newAssignment.file);
+      }
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          this.assignments.push(data);
+          this.showNotification('Assignment created successfully.');
+          this.cancelForm();
+          this.fetchAll(); // Fetch updated list
+        } else {
+          this.error = data.message;
+        }
+      } catch (error) {
+        this.error = "An error occurred. Please try again.";
+      }
+    },
+    async updateAssignment() {
   this.newAssignment.remaining_time = this.calculatedRemainingTime;
 
   const token = localStorage.getItem('token');
-  const method = this.editMode ? 'PUT' : 'POST';
-  const url = this.editMode ? `http://localhost/PSM_api_server/assignment/assignment.php/updateassignment/${this.newAssignment.id}` : 'http://localhost/PSM_api_server/assignment/assignment.php/createassignment';
+  const url = `http://localhost/PSM_api_server/assignment/assignment.php/updateassignment/${this.newAssignment.id}`;
 
   const formData = new FormData();
   formData.append('name', this.newAssignment.name);
@@ -131,7 +181,7 @@ export default {
 
   try {
     const response = await fetch(url, {
-      method: method,
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
       },
@@ -139,20 +189,18 @@ export default {
     });
 
     const data = await response.json();
+    console.log('Response:', response); // Debugging
+    console.log('Data:', data); // Debugging
     if (response.ok) {
-      if (this.editMode) {
-        this.assignments.splice(this.editIndex, 1, data);
-        this.showNotification('Assignment updated successfully.');
-      } else {
-        this.assignments.push(data);
-        this.showNotification('Assignment created successfully.');
-      }
+      this.assignments.splice(this.editIndex, 1, data);
+      this.showNotification('Assignment updated successfully.');
       this.cancelForm();
       this.fetchAll(); // Fetch updated list
     } else {
-      this.error = data.message;
+      this.error = data.message || 'Update failed. Please check your input.';
     }
   } catch (error) {
+    console.error('Error:', error); // Debugging
     this.error = "An error occurred. Please try again.";
   }
 },
@@ -183,6 +231,24 @@ export default {
         this.error = "An error occurred. Please try again.";
       }
     },
+    //download file
+    async downloadFile(id) {
+      // Create a hidden iframe to handle the download
+      const url = `http://localhost/PSM_api_server/assignment/assignment.php/downloadfile/${id}`;
+      
+      // Create an anchor element and set its href to the download URL
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = ''; // The browser will use the filename from the Content-Disposition header
+
+      // Append the anchor to the body and trigger a click
+      document.body.appendChild(a);
+      a.click();
+
+      // Remove the anchor from the DOM
+      document.body.removeChild(a);
+    },
+
     cancelForm() {
       this.newAssignment = {
         name: '',
