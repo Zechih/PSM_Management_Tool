@@ -1,18 +1,19 @@
 <template>
   <div>
     <h2>Grading Page</h2>
-    <div v-for="submission in studentSubmissions" :key="submission.studentId">
-      <h4>Student ID: {{ submission.studentId }}</h4>
+    <div v-for="submission in studentSubmissions" :key="submission.student_id">
+      <h4>Student ID: {{ submission.student_id }}</h4>
       <h4>Student Name: {{ submission.studentName }}</h4>
-      <div v-if="submission.studentSubmission">
+      <div v-if="submission.file_url">
         <h3>Submitted File:</h3>
-        <p><a :href="submission.studentSubmission.file_url" target="_blank">{{ submission.studentSubmission.file_name }}</a></p>
+        <p><a :href="submission.file_url" target="_blank">{{ submission.file_url }}</a></p>
         <div>
           <label for="grade">Grade:</label>
-          <input type="number" v-model="submission.grade" id="grade" />
+          <input type="text" v-model="submission.grade" id="grade" />
         </div>
         <button @click="submitGrade(submission)">Submit Grade</button>
       </div>
+      <p>Submitted Time: {{ submission.submittedtime }}</p>
     </div>
   </div>
 </template>
@@ -21,43 +22,45 @@
 export default {
   data() {
     return {
-      studentSubmissions: [
-        {
-          studentId: "A21EC0150",
-          studentName: "Yong Kok Siong",
-          studentSubmission: {
-            file_name: "Assignment1_Submission.pdf",
-            file_url: "http://example.com/assignment1_submission.pdf",
-          },
-          grade: null
-        },
-        {
-          studentId: "A21EC0021",
-          studentName: "Darren Leong Kah Xiang",
-          studentSubmission: {
-            file_name: "Assignment2_Submission.pdf",
-            file_url: "http://example.com/assignment2_submission.pdf",
-          },
-          grade: null
-        },
-        {
-          studentId: "A21EC0146",
-          studentName: "Yam Yuan Zhan",
-          studentSubmission: {
-            file_name: "Assignment3_Submission.pdf",
-            file_url: "http://example.com/assignment3_submission.pdf",
-          },
-          grade: null
-        }
-      ]
+      studentSubmissions: []
     };
   },
+  created() {
+    this.fetchStudentSubmissions();
+  },
   methods: {
+    fetchStudentSubmissions() {
+      const assignmentId = this.$route.params.assignmentId;
+      fetch(`http://localhost/PSM_api_server/grade/grades.php/submissions?assignmentId=${assignmentId}`)
+        .then(response => response.json())
+        .then(data => {
+          this.studentSubmissions = data;
+        })
+        .catch(error => {
+          console.error('Error fetching student submissions:', error);
+        });
+    },
     submitGrade(submission) {
-      // Simulate successful grade submission
-      alert(`Grade for ${submission.studentName} submitted successfully`);
-      // Redirect back to the lecturer dashboard
-      this.$router.push('/lecturer');
+      const gradeData = {
+        assignment_id: this.$route.params.assignmentId,
+        student_id: submission.student_id,
+        grade: submission.grade
+      };
+
+      fetch('http://localhost/PSM_api_server/grade/grades.php/grades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(gradeData)
+      })
+        .then(response => response.json())
+        .then(data => {
+          alert(`Grade for ${submission.studentName} submitted successfully`);
+        })
+        .catch(error => {
+          console.error('Error submitting grade:', error);
+        });
     }
   }
 };
