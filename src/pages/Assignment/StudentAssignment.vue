@@ -11,7 +11,7 @@
           <p><strong>Set Date:</strong> {{ formatDateTime(assignment.set_time) }}</p>
           <p><strong>Due Date:</strong> {{ formatDateTime(assignment.due_date) }}</p>
           <p><strong>Description:</strong> {{ assignment.description }}</p>
-          <p><strong>Remaining Time:</strong> {{ calculateRemainingTime(assignment.set_time, assignment.due_date) }}</p>
+          <p><strong>Remaining Time:</strong> {{ calculateRemainingTime(assignment.due_date) }}</p>
           <p v-if="assignment.file_name">
             <strong>File:</strong> {{ assignment.file_name }}
             <button @click="downloadFile(assignment.id)" style="background-color: #1394bb" class="button small-button">Download</button>
@@ -89,21 +89,21 @@ export default {
       const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
       return new Date(dateTime).toLocaleDateString('en-GB', options);
     },
-    calculateRemainingTime(setTime, dueDate) {
-      const setDateTime = new Date(setTime);
-      const dueDateTime = new Date(dueDate);
-      const remainingTime = dueDateTime - setDateTime;
+    calculateRemainingTime(dueDate) {
+    const currentTime = new Date();
+    const dueTimeDate = new Date(dueDate);
+    const remainingTime = dueTimeDate - currentTime;
 
-      if (isNaN(remainingTime)) {
-        return '';
-      }
+    if (isNaN(remainingTime) || remainingTime < 0) {
+      return 'Assignment overdue';
+    }
 
-      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
+    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
 
-      return `${days}d ${hours}h ${minutes}m`;
-    },
+    return `${days} days, ${hours} hours, ${minutes} minutes`;
+  },
     async fetchSubmissions() {
     const studentId = this.decodeToken();
     if (!studentId) {
@@ -228,7 +228,9 @@ export default {
   background-color: #4CAF50;
   color: white;
   padding: 15px;
+  border-radius: 4px;
   z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .student-container {
@@ -243,26 +245,48 @@ export default {
 .header {
   font-size: 24px;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px; /* Increased spacing between header and content */
+}
+
+.assignment-list {
+  margin-bottom: 40px; /* Spacing between assignment list and any following content */
+}
+
+.assignment-item {
+  background: #ecebeb;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px; /* Increased space between each assignment item */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for better separation */
+  border: 1px solid #e0e0e0; /* Light border for clear separation */
+}
+
+.assignment-item h3 {
+  margin-top: 0; /* Remove margin-top for heading to reduce extra space */
 }
 
 .assignment-form {
-  margin-bottom: 30px;
+  margin-top: 20px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px; /* Space between form fields */
 }
 
 .form-group label {
   display: block;
   margin-bottom: 5px;
+  font-weight: bold;
 }
 
 .form-group select,
 .form-group input {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ced4da;
   border-radius: 4px;
 }
@@ -293,10 +317,12 @@ export default {
 }
 
 .submission-item {
-  background: #f8f9fa;
+  background: white;
   padding: 15px;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px; /* Space between submission items */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for better separation */
+  border: 1px solid #e0e0e0; /* Light border for clear separation */
 }
 
 .no-assignments, .no-submissions {
@@ -310,4 +336,5 @@ export default {
   text-align: center;
   margin-bottom: 20px;
 }
+
 </style>

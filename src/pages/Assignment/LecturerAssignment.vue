@@ -8,14 +8,11 @@
 
     <form v-if="showForm" @submit.prevent="editMode ? updateAssignment() : createAssignment()" class="form">
       <input v-model="newAssignment.name" placeholder="Name" class="input" :class="{ 'is-invalid': !validName }"/><br>
-      <div class="input-group">
-        <input type="datetime-local" v-model="newAssignment.set_time" placeholder="Set Date" class="input" :class="{ 'is-invalid': !validSetTime }"/>
-        <button type="button" style="background-color: #1394bb" @click="setCurrentTime" class="button small-button">Set Current Time</button>
-      </div>
+      <input type="datetime-local" v-model="newAssignment.set_time" placeholder="Set Date" class="input" :class="{ 'is-invalid': !validSetTime }"/>
       <input type="datetime-local" v-model="newAssignment.due_date" placeholder="Due Date" class="input" :class="{ 'is-invalid': !validDueDate }"/><br>
       <input v-model="newAssignment.description" placeholder="Description" class="input" :class="{ 'is-invalid': !validDescription }"/><br>
       <div class="calculated-time">
-        Remaining Time: {{ calculatedRemainingTime }}
+        Remaining Time: {{ calculateRemainingTime(newAssignment.set_time, newAssignment.due_date) }}
       </div>
       <input type="file" @change="handleFileUpload" class="input"/><br>
       <button type="submit" style="background-color: #1394bb" class="button" :disabled="!formIsValid">{{ editMode ? 'Update Assignment' : 'Save Assignment' }}</button>
@@ -56,21 +53,17 @@ export default {
         set_time: '',
         due_date: '',
         description: '',
-        remaining_time: '',
         file_name: '',
-        file: null // Add file attribute
+        file: null
       },
       showForm: false,
       editMode: false,
       editIndex: -1,
       error: null,
-      notification: null // Add notification state
+      notification: null
     };
   },
   computed: {
-    calculatedRemainingTime() {
-      return this.calculateRemainingTime(this.newAssignment.set_time, this.newAssignment.due_date);
-    },
     validName() {
       return this.newAssignment.name && this.newAssignment.name.trim() !== '';
     },
@@ -100,7 +93,7 @@ export default {
         const data = await response.json();
         if (response.ok) {
           this.assignments = data;
-          console.log("Assignments fetched:", this.assignments); // Debugging: Check the fetched data
+          console.log("Assignments fetched:", this.assignments);
         } else {
           this.error = data.message;
         }
@@ -111,13 +104,12 @@ export default {
     startNewAssignment() {
       this.showForm = true;
       this.editMode = false;
-      this.newAssignment = { // Reset newAssignment for creating a new assignment
+      this.newAssignment = {
         id: null,
         name: '',
         set_time: '',
         due_date: '',
         description: '',
-        remaining_time: '',
         file_name: '',
         file: null
       };
@@ -126,8 +118,6 @@ export default {
       this.newAssignment.file = event.target.files[0];
     },
     async createAssignment() {
-      this.newAssignment.remaining_time = this.calculatedRemainingTime;
-
       const token = localStorage.getItem('token');
       const url = 'http://localhost/PSM_api_server/assignment/assignment.php/createassignment';
 
@@ -136,7 +126,6 @@ export default {
       formData.append('set_time', this.newAssignment.set_time);
       formData.append('due_date', this.newAssignment.due_date);
       formData.append('description', this.newAssignment.description);
-      formData.append('remaining_time', this.newAssignment.remaining_time);
       if (this.newAssignment.file) {
         formData.append('file', this.newAssignment.file);
       }
@@ -155,7 +144,7 @@ export default {
           this.assignments.push(data);
           this.showNotification('Assignment created successfully.');
           this.cancelForm();
-          this.fetchAll(); // Fetch updated list
+          this.fetchAll();
         } else {
           this.error = data.message;
         }
@@ -164,133 +153,137 @@ export default {
       }
     },
     async updateAssignment() {
-  this.newAssignment.remaining_time = this.calculatedRemainingTime;
+      const token = localStorage.getItem('token');
+      const url = `http://localhost/PSM_api_server/assignment/assignment.php/updateassignment/${this.newAssignment.id}`;
 
-  const token = localStorage.getItem('token');
-  const url = `http://localhost/PSM_api_server/assignment/assignment.php/updateassignment/${this.newAssignment.id}`;
+      const formData = new FormData();
+      formData.append('name', this.newAssignment.name);
+      formData.append('set_time', this.newAssignment.set_time);
+      formData.append('due_date', this.newAssignment.due_date);
+      formData.append('description', this.newAssignment.description);
+      if (this.newAssignment.file) {
+        formData.append('file', this.newAssignment.file);
+      }
 
-  const formData = new FormData();
-  formData.append('name', this.newAssignment.name);
-  formData.append('set_time', this.newAssignment.set_time);
-  formData.append('due_date', this.newAssignment.due_date);
-  formData.append('description', this.newAssignment.description);
-  formData.append('remaining_time', this.newAssignment.remaining_time);
-  if (this.newAssignment.file) {
-    formData.append('file', this.newAssignment.file);
-  }
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-      body: formData
-    });
-
-    const data = await response.json();
-    console.log('Response:', response); // Debugging
-    console.log('Data:', data); // Debugging
-    if (response.ok) {
-      this.assignments.splice(this.editIndex, 1, data);
-      this.showNotification('Assignment updated successfully.');
-      this.cancelForm();
-      this.fetchAll(); // Fetch updated list
-    } else {
-      this.error = data.message || 'Update failed. Please check your input.';
-    }
-  } catch (error) {
-    console.error('Error:', error); // Debugging
-    this.error = "An error occurred. Please try again.";
-  }
-},
+        const data = await response.json();
+        console.log('Response:', response);
+        console.log('Data:', data);
+        if (response.ok) {
+          this.assignments.splice(this.editIndex, 1, data);
+          this.showNotification('Assignment updated successfully.');
+          this.cancelForm();
+          this.fetchAll();
+        } else {
+          this.error = data.message || 'Update failed. Please check your input.';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        this.error = "An error occurred. Please try again.";
+      }
+    },
     editAssignment(assignment) {
-      this.newAssignment = { ...assignment };
       this.showForm = true;
       this.editMode = true;
       this.editIndex = this.assignments.indexOf(assignment);
+      this.newAssignment = { ...assignment };
     },
-    async deleteAssignment(id) {
+    async deleteAssignment(assignmentId) {
       const token = localStorage.getItem('token');
+      const url = `http://localhost/PSM_api_server/assignment/assignment.php/deleteassignment/${assignmentId}`;
+
       try {
-        const response = await fetch(`http://localhost/PSM_api_server/assignment/assignment.php/deleteassignment/${id}`, {
+        const response = await fetch(url, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
 
-        const data = await response.json();
         if (response.ok) {
-          this.assignments = this.assignments.filter(assignment => assignment.id !== id);
+          this.assignments = this.assignments.filter(assignment => assignment.id !== assignmentId);
           this.showNotification('Assignment deleted successfully.');
         } else {
+          const data = await response.json();
           this.error = data.message;
         }
       } catch (error) {
         this.error = "An error occurred. Please try again.";
       }
     },
-    //download file
-    async downloadFile(id) {
-      // Create a hidden iframe to handle the download
-      const url = `http://localhost/PSM_api_server/assignment/assignment.php/downloadfile/${id}`;
-      
-      // Create an anchor element and set its href to the download URL
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = ''; // The browser will use the filename from the Content-Disposition header
+    async downloadFile(assignmentId) {
+      const token = localStorage.getItem('token');
+      const url = `http://localhost/PSM_api_server/assignment/assignment.php/downloadfile/${assignmentId}`;
 
-      // Append the anchor to the body and trigger a click
-      document.body.appendChild(a);
-      a.click();
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-      // Remove the anchor from the DOM
-      document.body.removeChild(a);
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = this.assignments.find(assignment => assignment.id === assignmentId).file_name;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        } else {
+          const data = await response.json();
+          this.error = data.message;
+        }
+      } catch (error) {
+        this.error = "An error occurred. Please try again.";
+      }
     },
-
     cancelForm() {
+      this.showForm = false;
+      this.editMode = false;
       this.newAssignment = {
+        id: null,
         name: '',
         set_time: '',
         due_date: '',
         description: '',
-        remaining_time: '',
-        file: null // Reset file attribute
+        file_name: '',
+        file: null
       };
-      this.showForm = false;
-      this.editMode = false;
-    },
-    setCurrentTime() {
-      const now = new Date();
-      const timezoneOffset = now.getTimezoneOffset() * 60000; // offset in milliseconds
-      const localISOTime = new Date(now.getTime() - timezoneOffset).toISOString().slice(0, 16);
-      this.newAssignment.set_time = localISOTime;
-    },
-    formatDateTime(dateTime) {
-      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-      return new Date(dateTime).toLocaleDateString('en-GB', options);
     },
     calculateRemainingTime(setTime, dueDate) {
-      const setDateTime = new Date(setTime);
-      const dueDateTime = new Date(dueDate);
-      const remainingTime = dueDateTime - setDateTime;
+      const currentTime = new Date();
+      const setTimeDate = new Date(setTime);
+      const dueTimeDate = new Date(dueDate);
+      const remainingTime = dueTimeDate - currentTime;
 
       if (isNaN(remainingTime) || remainingTime < 0) {
-        return 'Invalid due date';
+        return 'Assignment due';
       }
 
       const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
       const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
 
-      return `${days}d ${hours}h ${minutes}m`;
+      return `${days} days, ${hours} hours, ${minutes} minutes`;
+    },
+    formatDateTime(dateTime) {
+      return new Date(dateTime).toLocaleString();
     },
     showNotification(message) {
       this.notification = message;
       setTimeout(() => {
         this.notification = null;
-      }, 3000); // Clear notification after 3 seconds
+      }, 3000);
     }
   },
   mounted() {
@@ -353,6 +346,7 @@ export default {
   
   .form {
     margin-bottom: 20px;
+    width: 100%;
   }
   
   .form-group {
@@ -401,7 +395,7 @@ export default {
   }
   
   .assignment-item {
-    background: #f8f9fa;
+    background: #ecebeb;
     padding: 15px;
     border: 1px solid #e9ecef;
     border-radius: 5px;
