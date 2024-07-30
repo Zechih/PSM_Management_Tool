@@ -75,6 +75,10 @@
         </div>
       </div>
     </div>
+
+    <div v-if="notification" class="notification">
+      {{ notification }}
+    </div>
   </div>
 </template>
 
@@ -93,6 +97,7 @@ export default {
         Mdescription: "",
       },
       editMeetingId: null,
+      notification: null,
     };
   },
   computed: {
@@ -162,21 +167,25 @@ export default {
             if (index !== -1) {
               this.meetings[index] = data; 
             }
+            this.showNotification("Meeting updated successfully!");
           } else {
             if (Array.isArray(this.meetings)) {
               this.meetings.push(data);
             } else {
               console.error("Error: `this.meetings` is not an array");
             }
+            this.showNotification("Meeting saved successfully!");
           }
           this.showForm = false;
           this.resetForm();
           this.fetchMeetings();
         } else {
           console.error("Error saving meeting:", data.message);
+          this.showNotification("Error saving meeting");
         }
       } catch (error) {
         console.error("Error saving meeting:", error);
+        this.showNotification("Error saving meeting");
       }
     },
 
@@ -188,11 +197,14 @@ export default {
 
         if (response.ok) {
           this.meetings = this.meetings.filter(m => m.id !== id);
+          this.showNotification("Meeting deleted successfully!");
         } else {
           console.error("Error deleting meeting:", await response.json());
+          this.showNotification("Error deleting meeting");
         }
       } catch (error) {
         console.error("Error deleting meeting:", error);
+        this.showNotification("Error deleting meeting");
       }
     },
 
@@ -219,6 +231,12 @@ export default {
       this.editMeetingId = null;
       this.editMode = false;
     },
+    showNotification(message) {
+      this.notification = message;
+      setTimeout(() => {
+        this.notification = null;
+      }, 3000);
+    },
   },
 
   created() {
@@ -228,6 +246,15 @@ export default {
 </script>
 
 <style>
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4caf50;
+  color: white;
+  padding: 15px;
+  z-index: 1000;
+}
 .container {
   max-width: 800px;
   margin: 0 auto;

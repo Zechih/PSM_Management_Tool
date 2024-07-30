@@ -35,7 +35,7 @@
             <p><strong>Your Submission:</strong></p>
             <p v-if="submission.file_name">
               <strong>File:</strong> {{ submission.file_name }}
-              <button style="background-color: #1394bb" @click="downloadFile(submission.id)" class="button small-button">Download</button>
+              <button style="background-color: #1394bb" @click="downloadSubmission(submission.id)" class="button small-button">Download</button>
             </p>
             <button @click="deleteSubmission(submission.id)" class="button delete-button">Delete</button>
           </div>
@@ -158,7 +158,7 @@ export default {
         const data = await response.json();
         if (response.ok) {
           this.submissions.push(data);
-          this.showNotification('Submit successfully.');
+          this.showNotification('Submit successfully!');
           this.fetchSubmissions();
         } else {
           this.error = data.message;
@@ -179,7 +179,7 @@ export default {
         const data = await response.json();
         if (response.ok) {
           this.fetchSubmissions();
-          this.showNotification('Submission deleted successfully.');
+          this.showNotification('Submission deleted successfully!');
         } else {
           this.error = data.message;
         }
@@ -194,6 +194,25 @@ export default {
       return this.submissions.filter(submission => submission.assignment_id === assignmentId);
     },
     async downloadFile(id) {
+      const url = `http://localhost/PSM_api_server/assignment/assignment.php/downloadfile/${id}`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    },
+    showNotification(message) {
+      // Implement a notification mechanism if needed
+      alert(message);
+    },
+    showNotification(message) {
+      this.notification = message;
+      setTimeout(() => {
+        this.notification = null;
+      }, 3000); // Clear notification after 3 seconds
+    },
+    async downloadSubmission(id) {
       const url = `http://localhost/PSM_api_server/assignment/submission.php/downloadsubmission/${id}`;
       const a = document.createElement('a');
       a.href = url;

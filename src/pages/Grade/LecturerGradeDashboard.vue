@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-5">
+  <div class="container">
     <h1 class="mb-4">Lecturer Grade Dashboard</h1>
     <p>Select an assignment to grade:</p>
     <div v-if="assignments.length === 0" class="alert alert-info" role="alert">
@@ -12,7 +12,7 @@
         :key="assignment.id"
         @click="gradeAssignment(assignment.id)"
       >
-        {{ assignment.name }} - Due: {{ assignment.due_date }}
+        {{ assignment.name }} - Due: {{ formatDateTime(assignment.due_date) }}
       </li>
     </ul>
   </div>
@@ -41,7 +41,10 @@ export default {
     },
     gradeAssignment(assignmentId) {
       this.$router.push(`/lecturer/grade/${assignmentId}`);
-    }
+    },
+    formatDateTime(dateTime) {
+      return new Date(dateTime).toLocaleString();
+    },
   }
 };
 </script>

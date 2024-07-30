@@ -118,23 +118,42 @@
             </div>
           </div>
         </div>
-        <div class = "text-center">
         <div class="text-center">
-          <p-button type="info" round @click.native.prevent="updateProfile" style="margin-right: 10px; background-color: #1394bb">
-            Update Profile
-          </p-button>
-          <p-button type="info" round @click.native.prevent="deleteAccount" style="margin-left: 10px; background-color: red">
-            Delete Account
-          </p-button>
-        </div>
+          <div class="text-center">
+            <p-button
+              type="info"
+              round
+              @click.native.prevent="updateProfile"
+              style="margin-right: 10px; background-color: #1394bb"
+            >
+              Update Profile
+            </p-button>
+            <p-button
+              type="info"
+              round
+              @click.native.prevent="deleteAccount"
+              style="margin-left: 10px; background-color: red"
+            >
+              Delete Account
+            </p-button>
+          </div>
         </div>
         <br />
         <div class="text-center">
-          <p-button type="info" round @click.native.prevent="logout" style="margin-left: 10px; background-color: grey">
+          <p-button
+            type="info"
+            round
+            @click.native.prevent="logout"
+            style="margin-left: 10px; background-color: grey"
+          >
             Logout
           </p-button>
         </div>
       </form>
+
+      <div v-if="notification" class="notification">
+        {{ notification }}
+      </div>
     </div>
   </card>
 </template>
@@ -153,6 +172,7 @@ export default {
         postcode: "",
         about_me: "",
       },
+      notification: null,
     };
   },
   methods: {
@@ -209,8 +229,8 @@ export default {
         );
         const data = await response.json();
         if (data.success) {
-          alert("Profile updated successfully");
-      
+          this.showNotification("Profile updated successfully!");
+
           // Fetch the updated user profile
           await this.fetchUserProfile();
         } else {
@@ -221,33 +241,36 @@ export default {
       }
     },
     async deleteAccount() {
-    try {
+      try {
         if (confirm("Are you sure you want to delete your account?")) {
-            const token = localStorage.getItem("token");
-            const payload = JSON.parse(atob(token.split(".")[1]));
-            const userId = payload.user_id;
+          const token = localStorage.getItem("token");
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          const userId = payload.user_id;
 
-            const response = await fetch(`http://localhost/PSM_api_server/authentication/profile.php/profile/${userId}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            const data = await response.json();
-            if (data.success) {
-                alert("Account deleted successfully");
+          const response = await fetch(
+            `http://localhost/PSM_api_server/authentication/profile.php/profile/${userId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          const data = await response.json();
+          if (data.success) {
+            this.showNotification("Account deleted successfully");
 
-                // Clear the token and navigate to the welcome page
-                localStorage.removeItem("token");
-                this.$router.push({ name: "welcome" });
-            } else {
-                console.error(data.message);
-            }
+            // Clear the token and navigate to the welcome page
+            localStorage.removeItem("token");
+            this.$router.push({ name: "welcome" });
+          } else {
+            console.error(data.message);
+          }
         }
-    } catch (error) {
+      } catch (error) {
         console.error(error);
-    }
-},
+      }
+    },
     logout() {
       // Clear the token from localStorage
       localStorage.removeItem("token");
@@ -277,6 +300,12 @@ export default {
         return "col-lg-3";
       }
     },
+    showNotification(message) {
+      this.notification = message;
+      setTimeout(() => {
+        this.notification = null;
+      }, 3000);
+    },
   },
   mounted() {
     this.fetchUserProfile();
@@ -284,4 +313,14 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4caf50;
+  color: white;
+  padding: 15px;
+  z-index: 1000;
+}
+</style>

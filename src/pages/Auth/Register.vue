@@ -26,35 +26,12 @@
         {{ error }}
       </div>
     </div>
+
+    <div v-if="notification" class="notification">
+      {{ notification }}
+    </div>
   </div>
 </template>
-
-<!-- <script>
-export default {
-  data() {
-    return {
-      username: "",
-      email: "",
-      password: "",
-      error: null,
-    };
-  },
-  methods: {
-    register() {
-      this.error = null;
-      // Simulate registration process
-      if (this.username === "" || this.email === "" || this.password === "") {
-        this.error = "All fields are required.";
-        return;
-      }
-      // Proceed with registration (this is just a simulation, you should replace it with actual registration logic)
-      alert("Registration successful!");
-      // Redirect to login page after successful registration
-      this.$router.push({ name: "login" });
-    },
-  },
-};
-</script> -->
 
 <script>
 export default {
@@ -65,6 +42,7 @@ export default {
       password: "",
       confirmPassword: "",
       error: null,
+      notification: null,
     };
   },
   methods: {
@@ -91,7 +69,7 @@ export default {
 
         const result = await response.json();
         if (response.ok) {
-          alert("Registration successful!");
+          this.showNotification("Registration successful!");
           this.$router.push({ name: "login" });
         } else {
           this.error = result.error;
@@ -99,12 +77,28 @@ export default {
       } catch (error) {
         this.error = "An error occurred. Please try again.";
       }
-    }
+    },
+    showNotification(message) {
+      this.notification = message;
+      setTimeout(() => {
+        this.notification = null;
+      }, 3000);
+    },
   }
 };
 </script>
 
 <style scoped>
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4caf50;
+  color: white;
+  padding: 15px;
+  z-index: 1000;
+}
+
 .register-container {
     display: flex;
     justify-content: flex-start; /* Position content to the right */
