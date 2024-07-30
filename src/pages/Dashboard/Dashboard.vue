@@ -95,21 +95,21 @@ export default {
       const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
       return new Date(dateTime).toLocaleDateString('en-GB', options);
     },
-    calculateRemainingTime(setTime, dueDate) {
-      const setDateTime = new Date(setTime);
-      const dueDateTime = new Date(dueDate);
-      const remainingTime = dueDateTime - setDateTime;
+    calculateRemainingTime(dueDate) {
+    const currentTime = new Date();
+    const dueTimeDate = new Date(dueDate);
+    const remainingTime = dueTimeDate - currentTime;
 
-      if (isNaN(remainingTime)) {
-        return '';
-      }
+    if (isNaN(remainingTime) || remainingTime < 0) {
+      return 'Assignment overdue';
+    }
 
-      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
+    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
 
-      return `${days}d ${hours}h ${minutes}m`;
-    },
+    return `${days} days, ${hours} hours, ${minutes} minutes`;
+  },
     setDefaultMonth() {
       const currentMonth = new Date().toLocaleString("default", { month: "long" });
       this.selectedMonth = currentMonth;
