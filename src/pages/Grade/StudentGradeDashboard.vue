@@ -1,9 +1,26 @@
 <template>
   <div>
-    <h2>Your Assignments Status</h2>
-    <div v-for="assignment in assignments" :key="assignment.id">
-      <p>{{ assignment.name }} - {{ assignment.status }}</p>
-      <button v-if="assignment.status === 'Graded'" @click="selectAssignment(assignment.id)">Check Grade</button>
+    <h2>Your Submissions</h2>
+    <div v-if="submissions.length === 0" class="text-center">No submissions found.</div>
+    <div v-else>
+      <div v-for="submission in submissions" :key="submission.id" class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Assignment: {{ submission.assignment_name }}</h5>
+          <p class="card-text">
+            Grading Status: 
+            <span :class="{'text-success': submission.grading_status === 1, 'text-danger': submission.grading_status === 0}">
+              {{ submission.grading_status === 1 ? 'Graded' : 'Submitted' }}
+            </span>
+          </p>
+          <button 
+            :class="{'btn btn-success': submission.grading_status === 1, 'btn btn-secondary': submission.grading_status === 0}"
+            :disabled="submission.grading_status === 0"
+            @click="checkGrade(submission)"
+          >
+            Check Grade
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -12,36 +29,52 @@
 export default {
   data() {
     return {
-      assignments: []
+      submissions: []
     };
   },
   created() {
-    this.fetchAssignments();
+    this.fetchSubmissions();
   },
   methods: {
-    fetchAssignments() {
-      const userId = this.$route.params.userId;
-      fetch(`http://localhost/PSM_api_server/grade/grades.php/assignments?userId=${userId}`)
+    fetchSubmissions() {
+      const userId = 3; // Replace this with the actual method to get the userId
+      fetch(`http://localhost/PSM_api_server/grade/grades.php/submissionsstudent?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
-          // Sort assignments by status: Submitted (0) before Graded (1)
-          this.assignments = data.sort((a, b) => {
-            if (a.status === 'Submitted' && b.status === 'Graded') return -1;
-            if (a.status === 'Graded' && b.status === 'Submitted') return 1;
-            return 0;
-          });
+          console.log('API Response:', data); // Log the response
+          if (Array.isArray(data)) {
+            this.submissions = data;
+          } else {
+            this.submissions = [];
+          }
         })
         .catch(error => {
-          console.error('Error fetching assignments:', error);
+          console.error('Error fetching submissions:', error);
+          this.submissions = [];
         });
     },
-    selectAssignment(assignmentId) {
-      this.$router.push({ name: 'StudentGradePage', params: { assignmentId } });
+    checkGrade(submission) {
+      if (submission.grading_status === 1) {
+        // Logic for handling grade check (e.g., navigate to a grade details page)
+        alert(`Grade for ${submission.assignment_name}: ${submission.grade}`);
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-/* Add specific styles here */
+.card {
+  width: 100%;
+  margin-top: 20px;
+}
+.text-success {
+  color: green;
+}
+.text-danger {
+  color: red;
+}
+.btn-secondary {
+  cursor: not-allowed;
+}
 </style>

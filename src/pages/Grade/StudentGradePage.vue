@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div v-if="filteredAssignment">
     <h2>Your Grades</h2>
     <div>
@@ -67,4 +67,5 @@ export default {
 
 <style scoped>
 /* Add specific styles here */
-</style>
+</style> -->
+all useless

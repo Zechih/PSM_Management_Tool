@@ -1,10 +1,20 @@
 <template>
-  <div>
-    <h2>Lecturer Dashboard</h2>
+  <div class="container mt-5">
+    <h1 class="mb-4">Lecturer Grade Dashboard</h1>
     <p>Select an assignment to grade:</p>
-    <button v-for="assignment in assignments" :key="assignment.id" @click="gradeAssignment(assignment.id)">
-      {{ assignment.name }}
-    </button>
+    <div v-if="assignments.length === 0" class="alert alert-info" role="alert">
+      No assignments found.
+    </div>
+    <ul class="list-group" v-else>
+      <li
+        class="list-group-item list-group-item-action"
+        v-for="assignment in assignments"
+        :key="assignment.id"
+        @click="gradeAssignment(assignment.id)"
+      >
+        {{ assignment.name }} - Due: {{ assignment.due_date }}
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -15,17 +25,13 @@ export default {
       assignments: []
     };
   },
-  created() {
+  mounted() {
     this.fetchAssignments();
   },
   methods: {
     fetchAssignments() {
-      const token = localStorage.getItem('token');
-      fetch('http://localhost/PSM_api_server/assignment/assignment.php/getassignmentlist', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })        .then(response => response.json())
+      fetch('http://localhost/PSM_API_SERVER/assignment/assignment.php/getassignmentlist')
+        .then(response => response.json())
         .then(data => {
           this.assignments = data;
         })
@@ -39,3 +45,12 @@ export default {
   }
 };
 </script>
+
+<style>
+.container {
+  max-width: 800px;
+}
+.list-group-item-action {
+  cursor: pointer;
+}
+</style>
